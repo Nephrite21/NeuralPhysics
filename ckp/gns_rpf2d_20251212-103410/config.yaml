@@ -1,0 +1,88 @@
+config: configs/rpf_2d/gns.yaml
+load_ckp: null
+mode: all
+seed: 0
+dtype: float64
+gpu: 0
+xla_mem_fraction: 0.75
+dataset:
+  src: datasets/2D_RPF_3200_20kevery100
+  name: null
+model:
+  name: gns
+  input_seq_length: 6
+  num_mp_steps: 10
+  num_mlp_layers: 2
+  latent_dim: 128
+  magnitude_features: false
+  isotropic_norm: false
+  lmax_attributes: 1
+  lmax_hidden: 1
+  segnn_norm: none
+  velocity_aggregate: avg
+train:
+  batch_size: 1
+  step_max: 500000
+  num_workers: 0
+  noise_std: 0.0003
+  optimizer:
+    lr_start: 0.0005
+    lr_final: 1.0e-06
+    lr_decay_rate: 0.1
+    lr_decay_steps: 100000.0
+  pushforward:
+    steps:
+    - -1
+    - 20000
+    - 300000
+    - 400000
+    unrolls:
+    - 0
+    - 1
+    - 2
+    - 3
+    probs:
+    - 18
+    - 2
+    - 1
+    - 1
+  loss_weight:
+    acc: 1.0
+    vel: 0.0
+    pos: 0.0
+eval:
+  n_rollout_steps: 20
+  test: false
+  rollout_dir: null
+  train:
+    n_trajs: 50
+    metrics_stride: 10
+    batch_size: 1
+    metrics:
+    - mse
+    out_type: none
+  infer:
+    n_trajs: -1
+    metrics_stride: 1
+    batch_size: 2
+    metrics:
+    - mse
+    - e_kin
+    - sinkhorn
+    out_type: pkl
+    n_extrap_steps: 0
+logging:
+  log_steps: 1000
+  eval_steps: 10000
+  wandb: false
+  wandb_project: rpf_2d
+  wandb_entity: lagrangebench
+  ckp_dir: ckp
+  run_name: gns_rpf2d_20251212-103410
+neighbors:
+  backend: jaxmd_vmap
+  multiplier: 1.25
+loss_weight:
+  acc: 1.0
+  momentum: 0.1
+  energy: 0.1
